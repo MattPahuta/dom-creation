@@ -19,11 +19,7 @@ var globalComments = [
     }    
 ];
 
-/*
-0: {name: "username", value: ""}
-1: {name: "subject", value: ""}
-2: {name: "comment", value: ""}
-*/
+
 
 $(document).ready(function(){
 
@@ -42,8 +38,12 @@ function onCommentFormSubmit(event){
     console.log("form data", formData);
 
     var comment = {};
-
-    $.each(formData, function(key, val){
+/*
+0: {name: "username", value: ""}
+1: {name: "subject", value: ""}
+2: {name: "comment", value: ""}
+*/
+    $.each(formData, function(index, val){
         comment[val.name] = val.value;
     });
 
@@ -68,23 +68,35 @@ function renderComments(comments){
 }
 
 function renderSingleComment(comment, target){
-    console.log("render this", comment);
 
-    var commentDiv = $("<div></div>");
+    //  'programmatic' style of DOM creation
+    //  -------------------------------
+    // var commentDiv = $("<div></div>");
 
-    var idHolder = $("<p></p>").text(comment.id);
-    commentDiv.append(idHolder);
+    // var idHolder = $("<p></p>").text(comment.id);
+    // commentDiv.append(idHolder);
 
-    var userHolder = $("<p></p>").text(comment.username);
-    commentDiv.append(userHolder);
+    // var userHolder = $("<p></p>").text(comment.username);
+    // commentDiv.append(userHolder);
 
-    var subjectHolder = $("<p></p>").text(comment.subject);
-    commentDiv.append(subjectHolder);
+    // var subjectHolder = $("<p></p>").text(comment.subject);
+    // commentDiv.append(subjectHolder);
 
-    var comHolder = $("<p></p>").text(comment.comment);
-    commentDiv.append(comHolder);
+    // var comHolder = $("<p></p>").text(comment.comment);
+    // commentDiv.append(comHolder);
 
+    // target.append(commentDiv);
 
-    target.append(commentDiv);
+    //  'clone and append' style of DOM creation
+    //  -------------------------------
+    var rawTemplate = $("#commentTemplate").html();
+
+    var clone = $(rawTemplate);
+    $(".comment-id", clone).text(comment.id);
+    $("h4", clone).text(comment.subject);
+    $("p.content", clone).text(comment.comment);
+    $("p.posted-date", clone).text(new Date());
+
+    target.append(clone);
 }
 
