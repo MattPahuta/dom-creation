@@ -3,7 +3,7 @@ var globalComments = [
         id:42,
         username:"Codor",
         subject:"Hello?",
-        comment: "YEEEET Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas imperdiet, tortor in blandit viverra, augue tellus laoreet felis, vitae consectetur elit erat id lacus. Phasellus ac bibendum sem. Etiam sit amet efficitur velit, eu sollicitudin lectus. Suspendisse bibendum sem vel quam aliquam, et laoreet dui ultrices. "
+        comment: "YEEEET Lorem ipsum dolor sit amet, <strong>consectetur adipiscing</strong> elit. Maecenas imperdiet, tortor in blandit viverra, augue tellus laoreet felis, vitae consectetur elit erat id lacus. Phasellus ac bibendum sem. Etiam sit amet efficitur velit, eu sollicitudin lectus. Suspendisse bibendum sem vel quam aliquam, et laoreet dui ultrices. "
     },
     {
         id:43,
@@ -19,16 +19,60 @@ var globalComments = [
     }    
 ];
 
-
+var lastReplyClicked = null;
 
 $(document).ready(function(){
 
-    renderComments(globalComments);
+    $("#commentsTarget").on("click", ".reply-btn", onReplyButtonClick);
 
-    //$("#showFormBtn").click(onShowFormBtnClick);
+    //$(".reply-btn").on("click", onReplyButtonClick);
+
+    renderComments(globalComments);
+    
+
     $("#showFormBtn").on("click", onShowFormBtnClick);
-    $("#commentForm").on("submit", onCommentFormSubmit);  
+    $("#commentForm").on("submit", onCommentFormSubmit);
+
+    $("#replyForm").on("submit", onReplyFormSubmit);
 });
+
+function onReplyFormSubmit(event){
+    event.preventDefault();
+
+    var formData = {
+        id:50,
+        username: $("#reply-username").val(),
+        subject: $("#reply-subject").val(),
+        comment: $("#reply-comment").val(),
+    };
+
+    console.log("form data", formData);
+
+
+    renderSingleComment(formData, lastReplyClicked);
+
+//     var comment = {};
+// /*
+// 0: {name: "username", value: ""}
+// 1: {name: "subject", value: ""}
+// 2: {name: "comment", value: ""}
+// */
+//     $.each(formData, function(index, val){
+//         comment[val.name] = val.value;
+//     });
+
+//     console.log("packaged form data", comment);
+
+//     renderSingleComment(comment, $("#formColumn"));
+}
+
+function onReplyButtonClick(event){
+    $('#myModal').modal('show');
+
+
+    lastReplyClicked = $(this).parents(".comment");
+
+}
 
 function onCommentFormSubmit(event){
     event.preventDefault();
@@ -39,17 +83,24 @@ function onCommentFormSubmit(event){
 
     var comment = {};
 /*
-0: {name: "username", value: ""}
-1: {name: "subject", value: ""}
-2: {name: "comment", value: ""}
+[
+    0: {name: "username", value: ""}
+    1: {name: "subject", value: ""}
+    2: {name: "comment", value: ""}
+]
 */
+    // for(var x=0;x<formData.length;x++){
+    //     var input = formData[x];
+    //     comment[input.name] = input.value;
+    // }
+
     $.each(formData, function(index, val){
         comment[val.name] = val.value;
     });
 
     console.log("packaged form data", comment);
 
-    renderSingleComment(comment, $("#formColumn"));
+    renderSingleComment(comment, $("#commentsTarget"));
 }
 
 function onShowFormBtnClick(event){
@@ -71,12 +122,15 @@ function renderSingleComment(comment, target){
 
     //  'programmatic' style of DOM creation
     //  -------------------------------
-    // var commentDiv = $("<div></div>");
+    // var commentDiv = $("<div>");
 
-    // var idHolder = $("<p></p>").text(comment.id);
+    // var idHolder = $("<p>")
+    //                 .addClass("comment-id")
+    //                 .text(comment.id);
+
     // commentDiv.append(idHolder);
 
-    // var userHolder = $("<p></p>").text(comment.username);
+    //  var userHolder = $("<p>").text(comment.username);
     // commentDiv.append(userHolder);
 
     // var subjectHolder = $("<p></p>").text(comment.subject);
@@ -91,11 +145,18 @@ function renderSingleComment(comment, target){
     //  -------------------------------
     var rawTemplate = $("#commentTemplate").html();
 
+    //  console.log("raw template", rawTemplate);
+
     var clone = $(rawTemplate);
+
+//  console.log("DOM", clone);
+    
     $(".comment-id", clone).text(comment.id);
     $("h4", clone).text(comment.subject);
     $("p.content", clone).text(comment.comment);
     $("p.posted-date", clone).text(new Date());
+
+    // $(".reply-btn", clone).on("click", onReplyButtonClick);
 
     target.append(clone);
 }
